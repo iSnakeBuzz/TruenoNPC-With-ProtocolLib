@@ -24,6 +24,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -239,15 +240,18 @@ public class TruenoNPC_v1_12_r1 implements TruenoNPC {
             @Override
             public void done(final SkinData skinData) {
                 final GameProfile profile = TruenoNPC_v1_12_r1.this.getGameProfile(randomString(4), skinData);
-                if (skinData == null) {
-                    TruenoNPC_v1_12_r1.this.setGameProfile(profile);
-                    TruenoNPC_v1_12_r1.this.cacheSkin(skinData);
-                }
-                try {
-                    TruenoNPC_v1_12_r1.this.spawnEntityV2(p, profile, skinData);
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
+                TruenoNPC_v1_12_r1.this.setGameProfile(profile);
+                TruenoNPC_v1_12_r1.this.cacheSkin(skinData);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            TruenoNPC_v1_12_r1.this.spawnEntityV2(p, profile, skinData);
+                        } catch (InvocationTargetException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.runTaskLater(plugin, 20);
             }
         });
     }
